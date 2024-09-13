@@ -1,0 +1,465 @@
+{
+	"info": {
+		"_postman_id": "380f791f-14dd-4eca-8db5-e4d60508d919",
+		"name": "Qtrip",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36328239"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var password = pm.variables.replaceIn(\"{{$guid}}\");\r",
+							"console.log(\"password\",password);\r",
+							"pm.environment.set(\"password\", password);\r",
+							"\r",
+							"var email = pm.variables.replaceIn(\"{{$randomEmail}}\");\r",
+							"pm.environment.set(\"email\", email);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"User Registration is Successful with 201 status\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Validation of success filed in json response\", function () {\r",
+							"   pm.expect(jsonData.success).to.eql(true);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"   "
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\",\r\n    \"confirmpassword\": \"{{password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{QTripURL}}/api/v1/register",
+					"host": [
+						"{{QTripURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User Login is Successful\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData.success).to.eql(true);\r",
+							"var userID = jsonData.data.id;\r",
+							"\r",
+							"pm.environment.set(\"userID\", userID);\r",
+							"pm.test(\"Validating id field is not null in Json response\", function () {\r",
+							"    pm.expect(userID).not.null\r",
+							"});\r",
+							"\r",
+							"pm.environment.set(\"token\", jsonData.data.token);\r",
+							"\r",
+							"\r",
+							"console.log(\"Login status code : \",pm.response.code);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{QTripURL}}/api/v1/login",
+					"host": [
+						"{{QTripURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search City",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Verify that Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var body = pm.response.json();\r",
+							"var cityCount = Object.keys(body);\r",
+							"\r",
+							"console.log(cityCount.length);\r",
+							"console.log(body[0].description);\r",
+							"\r",
+							"pm.test(\"Validating array length should be of 1\", function(){\r",
+							"    pm.expect(cityCount.length).to.be.eq(1);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{QTripURL}}/api/v1/cities?q=beng",
+					"host": [
+						"{{QTripURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cities"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "beng"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Adventure",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var body = pm.response.json();\r",
+							"\r",
+							"var adventureId = body[0].id;\r",
+							"console.log(adventureId);\r",
+							"pm.collectionVariables.set(\"adventureID\", adventureId);\r",
+							"\r",
+							"pm.test(\"Validating status code is 200 \", function(){\r",
+							"    pm.expect(pm.response.code).to.be.eq(200);\r",
+							"});\r",
+							"\r",
+							"var array = Object.keys(body);\r",
+							"var adventures = array.length;\r",
+							"\r",
+							"console.log(\"No of adventures :\", adventures);\r",
+							"\r",
+							"pm.test(\"validating list of adventures\", function(){\r",
+							"    pm.expect(adventures).to.be.above(0);\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{QTripURL}}/api/v1/adventures?city=bengaluru",
+					"host": [
+						"{{QTripURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"adventures"
+					],
+					"query": [
+						{
+							"key": "city",
+							"value": "bengaluru"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reservation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validating Successful reservation \", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Validation of success filed in json response\", function () {\r",
+							"    pm.expect(jsonData.success).to.eql(true);\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"userId\":\"{{userID}}\",\r\n   \"name\":\"{{userID}}\",\r\n   \"date\":\"2024-15-09\",\r\n   \"person\":\"1\",\r\n   \"adventure\":\"{{adventureID}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{QTripURL}}/api/v1/reservations/new",
+					"host": [
+						"{{QTripURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"reservations",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Reservation Details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var body = pm.response.json();\r",
+							"\r",
+							"var array = Object.keys(body);\r",
+							"var bookingList = array.length;\r",
+							"\r",
+							"pm.test(\"validating status code to be 200\", function(){\r",
+							"    pm.expect(pm.response.code).to.be.eq(200);\r",
+							"})\r",
+							"\r",
+							"pm.test(\"validating successful booking list is listed\", function(){\r",
+							"    pm.expect(bookingList).to.be.above(0);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{QTripURL}}/api/v1/reservations/?id={{userID}}",
+					"host": [
+						"{{QTripURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"reservations",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{userID}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Reservation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var body = pm.response.json();\r",
+							"\r",
+							"var adventureId = body.id;\r",
+							"\r",
+							"pm.test(\"Validating status code is 200 \", function(){\r",
+							"    pm.expect(pm.response.code).to.be.eq(200);\r",
+							"});\r",
+							"pm.test(\"Validating success field in Json response\", function(){\r",
+							"    pm.expect(body.success).to.be.eql(true);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"userId\":\"{{userID}}\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{QTripURL}}/api/v1/reservations/{{id}}\n",
+					"host": [
+						"{{QTripURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"reservations",
+						"{{id}}\n"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "adventureID",
+			"value": ""
+		}
+	]
+}
